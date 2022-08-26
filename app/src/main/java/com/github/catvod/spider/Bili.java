@@ -291,7 +291,8 @@ public class Bili extends Spider {
         try {
             JSONObject result = new JSONObject();
             String url = "https://api.bilibili.com/x/web-interface/search/type?search_type=video&keyword=" + URLEncoder.encode(key);
-            String content = OkHttpUtil.string(url, null);
+         //   String content = OkHttpUtil.string(url, null);
+            String content = OkHttpUtil.string(url, CookieHeaders());
             JSONObject data = new JSONObject(content).getJSONObject("data");
             JSONArray videos = new JSONArray();
             JSONArray RSArray = data.getJSONArray("result");
