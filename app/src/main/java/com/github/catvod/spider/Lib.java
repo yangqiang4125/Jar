@@ -247,6 +247,21 @@ public class Lib extends Spider {
         }
         return "";
     }
+    
+    private static String doReplaceRegex(Pattern pattern, String content) {
+        if (pattern == null) {
+            return content;
+        }
+        try {
+            Matcher matcher = pattern.matcher(content);
+            if (matcher.find()) {
+                return matcher.group(1).trim();
+            }
+        } catch (Exception e) {
+            SpiderDebug.log(e);
+        }
+        return content;
+    }
 
     /**
      * 视频详情信息
@@ -438,46 +453,41 @@ public class Lib extends Spider {
         return "";
     }
 
-    protected static HashMap<String, String> sHeaders() {
-        HashMap<String, String> headers = new HashMap<>();
-        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36");
-        headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
-        headers.put("Accept-encoding", "gzip, deflate, br");
-        headers.put("Accept-language", "zh-SG,zh;q=0.9,en-GB;q=0.8,en;q=0.7,zh-CN;q=0.6");
-        return headers;
-    }
+ //   protected static HashMap<String, String> sHeaders(String url) {
+  //      HashMap<String, String> headers = new HashMap<>();
+//        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36");
+ //       headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9");
+ //       headers.put("Accept-encoding", "gzip, deflate, br");
+  //      headers.put("Accept-language", "zh-SG,zh;q=0.9,en-GB;q=0.8,en;q=0.7,zh-CN;q=0.6");
+ //       return headers;
+ //   }
 
     @Override
     public String searchContent(String key, boolean quick) {
         try {
-            String url = "https://shitu.paodekuaiweixinqun.com/search?q=site%3Alibvio.me%2Fdetail+" + URLEncoder.encode(key);
-            Document docs = Jsoup.parse(OkHttpUtil.string(url, sHeaders()));
+            if (quick)
+                return "";
+            long currentTime = System.currentTimeMillis();
+            String url = siteUrl + "/index.php/ajax/suggest?mid=1&wd=" + URLEncoder.encode(key) + "&limit=10&timestamp=" + currentTime;
+            JSONObject searchResult = new JSONObject(OkHttpUtil.string(url, getHeaders(url)));
             JSONObject result = new JSONObject();
             JSONArray videos = new JSONArray();
-            JSONObject v = new JSONObject();
-            Elements list = docs.select("div.NJo7tc div.yuRUbf");
-            for (int i = 0; i < list.size(); i++) {
-                Element doc = list.get(i);
-                String sourceName = doc.select("div.yuRUbf a h3").text();
-                if (sourceName.contains(key)) {
-                    String list1 = doc.select("div.yuRUbf a").attr("href");
-                    Document link = Jsoup.parse(OkHttpUtil.string(list1, getHeaders(url)));
-                    Matcher matcher = regexVid.matcher(list1);
-                    Elements data = link.select("p.data");
-                    if (matcher.find()) {
-
-                        String group = matcher.group(1);
-                        String cover = link.select("div.stui-content__thumb a img").attr("data-original");
-                        String title = link.select("div.stui-content__detail h1").text();
-                        Pattern rms = Pattern.compile("更新：(\\S+)");
-                        String remark = doReplaceRegex(rms, data.get(3).text());
-
-                        v.put("vod_name", title);
-                        v.put("vod_remarks", remark);
-                        v.put("vod_id", group);
-                        v.put("vod_pic", cover);
-                        videos.put(v);
+            if (searchResult.getInt("total") > 0) {
+                JSONArray lists = new JSONArray(searchResult.getString("list"));
+                for (int i = 0; i < lists.length(); i++) {
+                    JSONObject vod = lists.getJSONObject(i);
+                    String id = vod.getString("id");
+                    String title = vod.getString("name");
+                    String cover = vod.getString("pic");
+                    if (!TextUtils.isEmpty(cover) && !cover.startsWith("http")) {
+                        cover = siteUrl + cover;
                     }
+                    JSONObject v = new JSONObject();
+                    v.put("vod_id", id);
+                    v.put("vod_name", title);
+                    v.put("vod_pic", cover);
+                    v.put("vod_remarks", "");
+                    videos.put(v);
                 }
             }
             result.put("list", videos);
@@ -487,18 +497,18 @@ public class Lib extends Spider {
         }
         return "";
     }
-
-    private static String doReplaceRegex(Pattern pattern, String src) {
-        if (pattern == null)
-            return src;
-        try {
-            Matcher matcher = pattern.matcher(src);
-            if (matcher.find()) {
-                return matcher.group(1).trim();
-            }
-        } catch (Exception e) {
-            SpiderDebug.log(e);
-        }
-        return src;
-    }
 }
+ //   private static String doReplaceRegex(Pattern pattern, String src) {
+//        if (pattern == null)
+//            return src;
+//        try {
+ //           Matcher matcher = pattern.matcher(src);
+//            if (matcher.find()) {
+//                return matcher.group(1).trim();
+//            }
+ //       } catch (Exception e) {
+  //          SpiderDebug.log(e);
+//        }
+ //       return src;
+//      }
+//}
