@@ -34,7 +34,7 @@ public class Kunyu77 extends Spider {
         String t = String.valueOf(System.currentTimeMillis()/ 1000) ;
 
         String zuhe=url+t+"XSpeUFjJ";
-        String TK=Misc.MD5(zuhe,CharsetUTF8);
+        String TK=Misc.MD5(zuhe, Misc.CharsetUTF8);
         headers.put("TK",TK);
         headers.put("t",t);
         return headers;
@@ -62,8 +62,8 @@ public class Kunyu77 extends Spider {
                 try {
                     if (extendsAll == null) {
                         String filterUrl = siteUrl + "/api.php/provide/searchFilter?type_id=0&pagenum=1&pagesize=1";                      
-                        String urlx="/api.php/provide/searchFilter?type_id=0&pagenum=1&pagesize=1";
-                        String filterContent = OkHttpUtil.string(filterUrl, getHeaders(urlx));
+//                        String urla="/api.php/provide/searchFilter?type_id=0&pagenum=1&pagesize=1";
+                        String filterContent = OkHttpUtil.string(filterUrl, getHeaders(filterUrl));
                         JSONObject filterObj = new JSONObject(filterContent).getJSONObject("data").getJSONObject("conditions");
                         extendsAll = new JSONArray();
                         // 年份
@@ -157,7 +157,7 @@ public class Kunyu77 extends Spider {
             JSONArray videos = new JSONArray();
             try {
                 String url = siteUrl + "/api.php/provide/homeBlock?type_id=0";
-                String urlx="/api.php/provide/homeBlock?type_id=0";
+                String urlx="/api.php/provide/homeBlock";
                 String content = OkHttpUtil.string(url, getHeaders(urlx));
                 JSONObject jsonObject = new JSONObject(decryptResponse(content));
                 JSONArray jsonArray = jsonObject.getJSONObject("data").getJSONArray("blocks");
@@ -201,8 +201,8 @@ public class Kunyu77 extends Spider {
                     continue;
                 url += "&" + key + "=" + URLEncoder.encode(val);
             }
-            String urlx="/api.php/provide/searchFilter?type_id=" + tid + "&pagenum=" + pg + "&pagesize=24";
-            String content = OkHttpUtil.string(url, getHeaders(urlx));
+//            String urlx="/api.php/provide/searchFilter?type_id=" + tid + "&pagenum=" + pg + "&pagesize=24";
+            String content = OkHttpUtil.string(url, getHeaders(url));
             JSONObject dataObject = new JSONObject(decryptResponse(content)).getJSONObject("data");
             JSONArray jsonArray = dataObject.getJSONArray("result");
             JSONArray videos = new JSONArray();
@@ -256,8 +256,8 @@ public class Kunyu77 extends Spider {
             vodAtom.put("vod_content", vObj.getString("brief").trim());
 
             url = siteUrl + "/api.php/provide/videoPlaylist?ids=" + ids.get(0);
-            String urlx="/api.php/provide/videoPlaylist?ids=" + ids.get(0);
-            String content = OkHttpUtil.string(url, getHeaders(urlx));
+//            urlg="/api.php/provide/videoPlaylist"+ ids.get(0);
+            content = OkHttpUtil.string(url, getHeaders(url));
             JSONArray episodes = new JSONObject(content).getJSONObject("data").getJSONArray("episodes");
             LinkedHashMap<String, ArrayList<String>> playlist = new LinkedHashMap<>();
             for (int i = 0; i < episodes.length(); i++) {
@@ -306,7 +306,7 @@ public class Kunyu77 extends Spider {
             String videoUrl = id;
             try {
                 String url = siteUrl + "/api.php/provide/parserUrl?url=" + id;
-                String urlx="/api.php/provide/parserUrl?url=" + id;
+                String urlx="/api.php/provide/parserUrl" + id;
                 String content = OkHttpUtil.string(url, getHeaders(urlx));
                 JSONObject dataObj = new JSONObject(decryptResponse(content)).getJSONObject("data");
                 JSONObject playHeader = dataObj.optJSONObject("playHeader");
