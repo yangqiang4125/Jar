@@ -28,9 +28,15 @@ public class Kunyu77 extends Spider {
 
     private String uAgent = "Dalvik/2.1.0 (Linux; U; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + " Build/" + Build.ID + ")";
 
-    private HashMap<String, String> getHeaders(String url) {
+     private HashMap<String, String> getHeaders(String url) {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("user-agent", uAgent);
+        String t = String.valueOf(System.currentTimeMillis()/ 1000) ;
+
+        String zuhe=url+t+"XSpeUFjJ";
+        String TK=Misc.MD5(zuhe, Misc.CharsetUTF8);
+        headers.put("TK",TK);
+        headers.put("t",t);
         return headers;
     }
 
@@ -225,7 +231,8 @@ public class Kunyu77 extends Spider {
     public String detailContent(List<String> ids) {
         try {
             String url = siteUrl + "/api.php/provide/videoDetail?ids=" + ids.get(0);
-            String content = OkHttpUtil.string(url, getHeaders(url));
+            String urlx="/api.php/provide/videoDetail" + ids.get(0);
+            String content = OkHttpUtil.string(url, getHeaders(urlx));
             JSONObject dataObject = new JSONObject(decryptResponse(content));
             JSONObject vObj = dataObject.getJSONObject("data");
             JSONObject result = new JSONObject();
