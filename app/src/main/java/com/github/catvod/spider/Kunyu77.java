@@ -230,7 +230,7 @@ public class Kunyu77 extends Spider {
     @Override
     public String detailContent(List<String> ids) {
         try {
-            String url = siteUrl + "/api.php/provide/videoDetail?ids=" + ids.get(0)+"&version=2.0.4&sj=1661957675;
+            String url = siteUrl + "/api.php/provide/videoDetail?ids=" + ids.get(0) + "&version=2.0.4&sj=1661957675;
             String urlx="/api.php/provide/videoDetail" + ids.get(0);
             String content = OkHttpUtil.string(url, getHeaders(urlx));
             JSONObject dataObject = new JSONObject(decryptResponse(content));
@@ -250,7 +250,7 @@ public class Kunyu77 extends Spider {
             vodAtom.put("vod_director", vObj.getString("director"));
             vodAtom.put("vod_content", vObj.getString("brief").trim());
 
-            url = siteUrl + "/api.php/provide/videoPlaylist?ids=" + ids.get(0)+"&version=2.0.4&sj=1661957675;
+            url = siteUrl + "/api.php/provide/videoPlaylist?ids=" + ids.get(0) + "&version=2.0.4&sj=1661957675;
             content = OkHttpUtil.string(url, getHeaders(url));
             JSONArray episodes = new JSONObject(content).getJSONObject("data").getJSONArray("episodes");
             LinkedHashMap<String, ArrayList<String>> playlist = new LinkedHashMap<>();
